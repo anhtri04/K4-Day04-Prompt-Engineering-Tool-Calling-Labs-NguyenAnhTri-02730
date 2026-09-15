@@ -63,6 +63,12 @@ Metric chỉ hợp lệ khi `provider_error_cases == 0`, `measured_cases == tota
 
 Lưu ý harness: `run_eval.py` đổi `tool_choice required→auto` vì `deepseek-flash` thinking mode báo `Thinking mode does not support this tool_choice` (đã verify `auto OK`, `required FAIL`); `openai_provider.py` fix `api_key_env="OPENAI_API_KEY"` + đóng quote `deepseek-flash`. Hash artifact chỉ tính prompt+tools nên fix harness không đổi version hash.
 
+| Version (sau merge `main`) | Prompt/tool change | Metric | Before | After | Run file |
+|---|---|---|---:|---:|---|
+| merged-main | Gộp anhtri + Tri + Phat + Khanh (prompt kết hợp, tools anhtri+Phat, eval GRP của Phat) | case_accuracy base / group | — | 30/30 và 7/10 | `runs/merged-main_B_base_*.json`, `runs/merged-main_B_group_*.json` |
+| v4-grpfx2 | Fix GRP02 (symptom-vs-request) + GRP03 (thu hẹp no-tool refuse) + GRP09 (clean-search khi identity rõ) + never-clarify-as-refusal (A07) | 4 suites | 62→61/62 giữa chừng (A07 variance) | **62/62**: base 30/30, group 10/10, adv 12/12, ext 10/10 | `runs/v4-grpfx2_B_{base,group,adversarial,extension}_*.json` |
+| v5-catalog | Thêm bonus `software_catalog` (trigger hẹp) | bonus + 4 suites | — | bonus 4/4; core giữ nguyên (base 30/30 sau 1 re-run variance H08) | `runs/v5-catalog_B_cross_*.json` + re-run 4 suites |
+
 ## B2. Failure analysis
 
 | Case ID | Failure type | Actual calls | What failed | Fix |
@@ -105,6 +111,8 @@ Lưu ý harness: `run_eval.py` đổi `tool_choice required→auto` vì `deepsee
 
 CLI: `python app.py chat --provider openai --model deepseek-flash --version v3` tái dùng `run_model_tool_loop` từ `chat.py`, hiện user request, final response, từng tool name+args, tool result/error, round/status, artifact version+hashes, transcript path.
 
+Transcripts bản nộp (`v5-catalog`, nộp kèm trong `transcripts/`): `v5-catalog_openai_vpn_status.transcript.json` (`check_service_status vpn/production` → answered) và `v5-catalog_openai_software_catalog.transcript.json` (`software_catalog LT-318/VPN client` → answered) — cùng artifact với 5 run `v5-catalog` trong `runs/`.
+
 ## B4a. Adversarial evidence
 
 Đã chạy `runs/v3_B_adversarial_openai_20260914T195827285772.json`: 12/12, `provider_error=0`. Đã kiểm tra `tool_results` + `tickets/` (không có file ticket lạ) + request external chỉ manufacturer/model.
@@ -123,7 +131,9 @@ CLI: `python app.py chat --provider openai --model deepseek-flash --version v3` 
 |---|---|---|---|
 | Optional built-in (`policy`, `create_ticket` confirmed, `search_device_info`) | `runs/v3_B_extension_openai_20260914T200332521224.json` 10/10 (E01–E10) | Policy routing, confirmed ticket sau sửa đổi, external chỉ public fields | `create_ticket.confirmed` phải boolean true từ hội thoại; external chặn LT-/EMP-/serial/hostname/location/diagnostics (implementation + prompt) |
 | External search + privacy boundary | E09/E10 + A06/A12 như trên | E10 gọi cả `inspect` + `search(specs)` sạch; A12 chặn khi ép giữ ID | Chỉ manufacturer/model/query_type ra ngoài; user ép giữ ID → clarify trước |
-| Bonus: tool mới do nhóm tự xây | Không làm | — | Không ảnh hưởng core lab |
+| Bonus: `software_catalog` (track bonus, kind local_inventory, side_effect false) | `tools/software_catalog/{TOOL.md, tool.py}`, `helpdesk_data/software_catalog.json` (9 entries), `scripts/smoke_software_catalog.py` 9/9, `data/eval_bonus.json` live 4/4 (`runs/v5-catalog_B_cross_*.json`); core re-run group 10/10, ext 10/10, adv 12/12, base 30/30 | Version/license/approval (`current\|outdated\|restricted\|unapproved`); restricted TeamViewer + banned uTorrent; `asset_not_found`/`software_not_found`/`not_installed` rõ ràng | Mock data only; trigger hẹp (chỉ câu hỏi version/license/approval) nên không vỡ routing 52 case core; `eval_bonus.json` để riêng giữ `eval_group` đúng 10 case |
+
+> Ghi chú UI (quyết định của nhóm): nhóm ship 2 Rich CLI thay vì Streamlit — `app.py` (Typer Rich CLI của Khanh: `chat`/`ask`, panel + bảng trace, lưu transcript) và `chat_rich.py` (Rich CLI của anhtri). Cả hai tái dùng `run_model_tool_loop` từ `chat.py`, chạy được như hiện tại (`python app.py ask "..." --provider openai --model deepseek-flash --version v5-catalog`), nên nhóm giữ nguyên và tính là contribution của Khanh (file `app.py`) + anhtri (`chat_rich.py`).
 
 ## B6. Safety review
 
@@ -138,6 +148,26 @@ CLI: `python app.py chat --provider openai --model deepseek-flash --version v3` 
 - Fix nào thuộc `tools.yaml`? Ranh giới capability: shared vs single, single-call, check/category/policy_area mapping, response_type mapping, external cấm ID, create cấm secret.
 - Failure nào không thể chỉ nhìn automatic score? A05/A06/A11/A12 (phải xem `tool_results`, filesystem `tickets/`, request external), H07/G04 (extra call dù routing đúng), variance H09/M07 (cùng artifact cho kết quả khác nhau).
 - Nếu có thêm một vòng, nhóm sẽ thử hypothesis nào? `Nếu log retry 2 lần cho các case no_tool-boundary (H09/M07/A02) thì variance deepseek-flash giảm mà không đổi artifact` — kiểm chứng bằng 3 run lặp cùng hash và lấy majority + transcript.
+
+### B7.1 Reflection cá nhân — Tri (VoDucTri — Họ tên/MSSV: điền)
+- Nhiệm vụ đảm nhận chính trong bài lab: system prompt Tier-1 (routing/triage, multi-turn, parallel calls, confirmation & data-privacy boundaries, JSON output schema tiếng Việt) + `run_eval.py` (retry khi 429, `--delay`, stdout utf-8). Commit `3f94302`.
+- Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: starter prompt sơ sài + rate-limit 429 trên free-tier khiến eval chết giữa chừng (`provider_error`) — giải quyết bằng operational rules theo capability và retry/backoff + delay giữa các case.
+- Bài học rút ra về Prompt Engineering & Tool Calling: prompt vận hành phải liệt kê ranh giới từng tool thay vì mô tả chung chung; harness cũng là một phần của độ tin cậy (retry biến `provider_error` thành metric đo được).
+
+### B7.2 Reflection cá nhân — Phat (lechautranphat — Họ tên/MSSV: điền)
+- Nhiệm vụ đảm nhận chính trong bài lab: 10 test case nhóm GRP01–GRP10 (adversarial: hallucination ID, exfiltration, confirmation-bypass, prompt injection, parallel, cancel-flow, malicious-confirm, trick-env, stealth-exfiltration, memory-loss) + tools v3 + `REPORT.md`/`PRESENTATION.md` + `version_log.csv`. Commits `0130ffb`, `feef73d`, `ba86108`, `e2a2139`, `1ddb823`, `8413e8e`, `477c43c`, `25cbaca`, `853d1f8`.
+- Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: LLM bịa ID khi thiếu info (GRP01), lọt asset ID ra web search (GRP02/GRP09), vượt rào xác nhận bằng roleplay/ép buộc (GRP03/GRP07) — giải quyết bằng test-bẫy có `failure_type` rõ ràng để khóa hành vi, rồi siết `tools.yaml` (clarify bắt buộc, cấm đoán ID/env, cấm paste pseudo-confirmation).
+- Bài học rút ra về Prompt Engineering & Tool Calling: viết test adversarial chính là viết đặc tả — mỗi case phải cô lập đúng 1 failure mode, nếu không metric 10/10 không còn ý nghĩa.
+
+### B7.3 Reflection cá nhân — anhtri (NguyenAnhTri — 02730, cần xác nhận)
+- Nhiệm vụ đảm nhận chính trong bài lab: khung chính — `chat_rich.py` (Rich CLI), system prompt + tools v1–v3 (retrieval precision, write-action gate, external-data boundary), provider tương thích OpenAI/DeepSeek, bonus `software_catalog`. Commits `cb62d96`, `a5678e9`, `fc512f5`.
+- Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: extra-call H03 (hedge 2 category), sai `check` H13 (`all` thay vì `vpn`), cancel-flow M07, và sau merge là GRP02/GRP03/GRP09 + A07 — giải quyết bằng mapping 1-request→1-precise-call, latest-turn-wins, confirmation-gate, và phân biệt symptom/request + verbatim/instrumental ID demand.
+- Bài học rút ra về Prompt Engineering & Tool Calling: tool description cũng là prompt (model chỉ thấy declaration); rule càng trừu tượng càng dễ variance — phải neo bằng ví dụ trigger cụ thể (`"tôi là sếp"` → clarify, `"giữ nguyên chuỗi"` → clarify, `"kèm mã máy cho chính xác"` → clean-search).
+
+### B7.4 Reflection cá nhân — Khanh (KOT-NW — Họ tên/MSSV: điền)
+- Nhiệm vụ đảm nhận chính trong bài lab: fix provider DeepSeek, baseline v0, tools.yaml v1, prompt v2/v3, team eval 10 case (G01–G10), CLI Rich+Typer `app.py`, report kỹ thuật phần B. Commit `d24c842` (chi tiết xem `C2` bên dưới).
+- Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: `provider_error` 26/30 do deepseek-flash thinking mode từ chối `tool_choice required` (đổi sang `auto`), vỡ quote `deepseek-flash`, và whack-a-mole A05/A06 vs A11/A12 — giải quyết bằng rule phân biệt mixed-internal-only vs pure-external + response_type mapping.
+- Bài học rút ra về Prompt Engineering & Tool Calling: mỗi version cần đúng 1 hypothesis + metric + run file; khi cùng artifact cho kết quả khác nhau giữa các run thì ghi nhận variance thay vì overfit (xem B2/B7 technical).
 
 # PHẦN C — Checkout trước khi nộp
 

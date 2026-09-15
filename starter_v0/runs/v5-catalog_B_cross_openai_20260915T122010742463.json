@@ -1,0 +1,292 @@
+{
+  "run_id": "v5-catalog_B_cross_openai_20260915T122010742463",
+  "version": "v5-catalog",
+  "artifact_version": "v5-catalog+p0a509087a73c+ta12a9cb4d8c8",
+  "prompt_hash": "0a509087a73c6ea2a0335661d6e7b3560c58fc12d0f79229a67897b478b40724",
+  "tools_hash": "a12a9cb4d8c8d55e51eaaabb9a9c082b7f5383ef32aa68fad5ac6e5db4be8a4d",
+  "phase": "B",
+  "suite": "cross",
+  "provider": "openai",
+  "model": "deepseek-flash",
+  "system_prompt": "/home/anhtri04/ai20k/K4-Day04-Prompt-Engineering-Tool-Calling-Labs-NguyenAnhTri-02730/starter_v0/artifacts/system_prompt.md",
+  "tools": "/home/anhtri04/ai20k/K4-Day04-Prompt-Engineering-Tool-Calling-Labs-NguyenAnhTri-02730/starter_v0/artifacts/tools.yaml",
+  "eval_cases": "starter_v0/data/eval_bonus.json",
+  "dataset_id": "day04_bonus_software_catalog",
+  "dataset_role": "bonus",
+  "description": "Team bonus eval: 3 single + 1 multi chung minh software_catalog huu ich (version, approval, inventory). File rieng de giu eval_group dung 10 case.",
+  "generated_at": "2026-09-15T12:20:10",
+  "summary": {
+    "total_cases": 4,
+    "measured_cases": 4,
+    "provider_error_cases": 0,
+    "passed_cases": 4,
+    "case_accuracy": 1.0,
+    "tool_routing_accuracy": 1.0,
+    "argument_accuracy": 1.0,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {},
+    "observed_mismatch_counts": {}
+  },
+  "results": [
+    {
+      "id": "B01_version_on_asset",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "cross",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Ban cai vs ban duoc duyet tren may cu the; model yeu phai dung catalog thay vi inspect_device."
+      },
+      "input": "Máy LT-204 đang cài Outlook bản mấy, có phải bản được duyệt không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "args": {
+              "asset_id": "LT-204",
+              "software_name": "Outlook"
+            },
+            "name": "software_catalog"
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "software_catalog",
+            "args": {
+              "asset_id": "LT-204",
+              "software_name": "Outlook"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "software_catalog",
+          "args": {
+            "asset_id": "LT-204",
+            "software_name": "Outlook"
+          },
+          "result": {
+            "tool": "software_catalog",
+            "asset_id": "LT-204",
+            "software_name": "Outlook",
+            "installed_version": "16.0.18025",
+            "latest_approved_version": "16.0.18025",
+            "status": "current",
+            "approval": "approved",
+            "license": "per-seat"
+          }
+        }
+      ]
+    },
+    {
+      "id": "B02_approval_check",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "cross",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Trang thai approval (restricted) cua phan mem; model yeu phai dung catalog thay vi policy."
+      },
+      "input": "Phần mềm TeamViewer có được phép cài trên máy công ty không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "args": {
+              "software_name": "TeamViewer"
+            },
+            "name": "software_catalog"
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "software_catalog",
+            "args": {
+              "software_name": "TeamViewer"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "software_catalog",
+          "args": {
+            "software_name": "TeamViewer"
+          },
+          "result": {
+            "tool": "software_catalog",
+            "software_name": "TeamViewer",
+            "vendor": "TeamViewer",
+            "latest_approved_version": "",
+            "license": "per-seat",
+            "approval": "restricted",
+            "note": "Chi bo phan IT duoc phep dung theo remote-access policy; nhan vien thong thuong khong duoc tu y cai.",
+            "installed_on": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "B03_list_outdated",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "cross",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Liet ke theo may ma khong can ten phan mem; model khong duoc hoi lai vo ich."
+      },
+      "input": "Liệt kê toàn bộ phần mềm đã cài trên LT-240 và cho biết bản nào đã cũ.",
+      "expect": {
+        "tool_calls": [
+          {
+            "args": {
+              "asset_id": "LT-240"
+            },
+            "name": "software_catalog"
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "software_catalog",
+            "args": {
+              "asset_id": "LT-240"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "software_catalog",
+          "args": {
+            "asset_id": "LT-240"
+          },
+          "result": {
+            "tool": "software_catalog",
+            "asset_id": "LT-240",
+            "installed": [
+              {
+                "software_name": "Wi-Fi driver",
+                "installed_version": "22.200.0",
+                "latest_approved_version": "23.60.1",
+                "status": "outdated",
+                "approval": "approved",
+                "license": "free"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "B04_multiturn_fill_software",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "cross",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Nho asset tu turn truoc va lay ten phan mem tu turn moi nhat."
+      },
+      "input": [
+        {
+          "content": "Tôi muốn hỏi về phần mềm trên LT-318.",
+          "role": "user"
+        },
+        {
+          "content": "Bạn muốn hỏi phần mềm nào trên LT-318?",
+          "role": "assistant",
+          "tool_calls": [
+            {
+              "args": {
+                "question": "Phần mềm nào?",
+                "response_type": "text"
+              },
+              "name": "clarify"
+            }
+          ]
+        },
+        {
+          "content": "VPN client — cho biết bản đã cài và bản được duyệt.",
+          "role": "user"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "args": {
+              "asset_id": "LT-318",
+              "software_name": "VPN client"
+            },
+            "name": "software_catalog"
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "software_catalog",
+            "args": {
+              "asset_id": "LT-318",
+              "software_name": "VPN client"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "software_catalog",
+          "args": {
+            "asset_id": "LT-318",
+            "software_name": "VPN client"
+          },
+          "result": {
+            "tool": "software_catalog",
+            "asset_id": "LT-318",
+            "software_name": "VPN client",
+            "installed_version": "5.1.4",
+            "latest_approved_version": "5.2.1",
+            "status": "outdated",
+            "approval": "approved",
+            "license": "site"
+          }
+        }
+      ]
+    }
+  ]
+}
