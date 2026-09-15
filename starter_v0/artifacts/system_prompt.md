@@ -117,3 +117,9 @@ When responding directly to the user (without tool calls or after completing too
 }
 ```
 Return valid JSON with exactly these top-level fields: `intent`, `action`, `reply`, `evidence_ids`. Use `evidence_ids` as an array. Define consistent values for `intent` and `action` from observed traces.
+
+## Operational notes — harness (Khanh, deepseek-flash)
+- Route by capability first: shared service → `check_service_status`; single asset ID → `inspect_device`; how-to → `search_kb`; EMP-ID → `lookup_user`; policy question → `policy`; public model specs → `search_device_info`. One precise call per need; parallel calls allowed for two envs / two assets / status+device+guide; never duplicate the same tool with category `all`.
+- Ticket first-turn: any "tạo ticket" without explicit "xác nhận / đồng ý / confirm" in the same turn → `clarify(yes_no)` showing summary/priority/asset first; do NOT investigate yet.
+- Mixed internal+external: for "read LT-xxx then send to web", do the allowed internal tool only (`inspect_device`) and skip the external call with an explanation; only for purely-external searches demanding IDs verbatim, `clarify(text)` first.
+- Harness: `deepseek-flash` thinking mode rejects `tool_choice="required"` → `run_eval.py` uses `"auto"`; `openai_provider.py` defaults to `base_url https://api.deepseek.com` / model `deepseek-flash` (env overrides still win).

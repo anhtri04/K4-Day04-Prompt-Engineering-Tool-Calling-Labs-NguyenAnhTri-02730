@@ -14,13 +14,14 @@ class OpenAIProvider:
         self,
         *,
         api_key_env: str = "OPENAI_API_KEY",
-        base_url: str | None = None,
-        default_model: str = "gpt-4o-mini",
+        base_url: str = "https://api.deepseek.com",
+        default_model: str = "deepseek-flash",
     ) -> None:
         self.api_key_env = api_key_env
         # Allow OpenAI-compatible endpoints (e.g. DeepSeek) via env without
         # changing call sites. Supports both OPENAI_* and DEEPSEEK_* names.
-        self.base_url = base_url or os.getenv("OPENAI_BASE_URL") or os.getenv("DEEPSEEK_BASE_URL") or None
+        # Env overrides win; khanh's deepseek defaults apply otherwise.
+        self.base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("DEEPSEEK_BASE_URL") or base_url or None
         self.default_model = os.getenv("OPENAI_MODEL") or os.getenv("DEEPSEEK_MODEL") or default_model
 
     def complete(
