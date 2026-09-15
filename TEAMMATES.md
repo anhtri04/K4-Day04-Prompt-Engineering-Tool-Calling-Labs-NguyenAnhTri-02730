@@ -3,6 +3,14 @@
 Nhánh `main` sau khi merge đầy đủ 4 thành viên (mỗi người ≥ 1 commit gốc trong lịch sử `main`).
 Merge commits trên `main`: `382a62d` (anhtri) → `81a24cc` (Tri) → `e8f3017` (phat) → `6360a93` (khanh).
 
+## Thành viên
+| # | Họ tên | MSSV | Branch | Vai trò |
+|---|---|---|---|---|
+| 1 | Võ Đức Trí | (chưa rõ — cần bổ sung) | `Tri` | System prompt & eval harness |
+| 2 | Phát | (chưa rõ — cần bổ sung) | `phat` | 10 test case eval_group + tools v3 + docs |
+| 3 | Nguyễn Anh Trí (lead) | 2A202602730 | `anhtri` | Khung chính (prompt/tools, CLI, provider, bonus tool) |
+| 4 | ĐỖ HOÀNG NAM KHÁNH | 2A202602423 | `khanh` | DeepSeek harness + CLI + REPORT |
+
 ## 1. Tri — System prompt & eval harness
 - Nhiệm vụ: system prompt Tier-1 (routing/triage, multi-turn, parallel calls, confirmation & data-privacy boundaries, JSON output schema, trả lời tiếng Việt) + `run_eval.py` (retry khi 429, `--delay`, stdout utf-8).
 - Branch: `Tri` (merged vào `main` qua `81a24ccac346247966c1eb89d47927bf47210ecf`).

@@ -149,22 +149,22 @@ Transcripts bản nộp (`v5-catalog`, nộp kèm trong `transcripts/`): `v5-cat
 - Failure nào không thể chỉ nhìn automatic score? A05/A06/A11/A12 (phải xem `tool_results`, filesystem `tickets/`, request external), H07/G04 (extra call dù routing đúng), variance H09/M07 (cùng artifact cho kết quả khác nhau).
 - Nếu có thêm một vòng, nhóm sẽ thử hypothesis nào? `Nếu log retry 2 lần cho các case no_tool-boundary (H09/M07/A02) thì variance deepseek-flash giảm mà không đổi artifact` — kiểm chứng bằng 3 run lặp cùng hash và lấy majority + transcript.
 
-### B7.1 Reflection cá nhân — Tri (VoDucTri — Họ tên/MSSV: điền)
+### B7.1 Reflection cá nhân — Võ Đức Trí — MSSV: (chưa rõ, cần bổ sung)
 - Nhiệm vụ đảm nhận chính trong bài lab: system prompt Tier-1 (routing/triage, multi-turn, parallel calls, confirmation & data-privacy boundaries, JSON output schema tiếng Việt) + `run_eval.py` (retry khi 429, `--delay`, stdout utf-8). Commit `3f94302`.
 - Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: starter prompt sơ sài + rate-limit 429 trên free-tier khiến eval chết giữa chừng (`provider_error`) — giải quyết bằng operational rules theo capability và retry/backoff + delay giữa các case.
 - Bài học rút ra về Prompt Engineering & Tool Calling: prompt vận hành phải liệt kê ranh giới từng tool thay vì mô tả chung chung; harness cũng là một phần của độ tin cậy (retry biến `provider_error` thành metric đo được).
 
-### B7.2 Reflection cá nhân — Phat (lechautranphat — Họ tên/MSSV: điền)
+### B7.2 Reflection cá nhân — Phát (lechautranphat) — MSSV: (chưa rõ, cần bổ sung)
 - Nhiệm vụ đảm nhận chính trong bài lab: 10 test case nhóm GRP01–GRP10 (adversarial: hallucination ID, exfiltration, confirmation-bypass, prompt injection, parallel, cancel-flow, malicious-confirm, trick-env, stealth-exfiltration, memory-loss) + tools v3 + `REPORT.md`/`PRESENTATION.md` + `version_log.csv`. Commits `0130ffb`, `feef73d`, `ba86108`, `e2a2139`, `1ddb823`, `8413e8e`, `477c43c`, `25cbaca`, `853d1f8`.
 - Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: LLM bịa ID khi thiếu info (GRP01), lọt asset ID ra web search (GRP02/GRP09), vượt rào xác nhận bằng roleplay/ép buộc (GRP03/GRP07) — giải quyết bằng test-bẫy có `failure_type` rõ ràng để khóa hành vi, rồi siết `tools.yaml` (clarify bắt buộc, cấm đoán ID/env, cấm paste pseudo-confirmation).
 - Bài học rút ra về Prompt Engineering & Tool Calling: viết test adversarial chính là viết đặc tả — mỗi case phải cô lập đúng 1 failure mode, nếu không metric 10/10 không còn ý nghĩa.
 
-### B7.3 Reflection cá nhân — anhtri (NguyenAnhTri — 02730, cần xác nhận)
+### B7.3 Reflection cá nhân — Nguyễn Anh Trí (lead) — 2A202602730
 - Nhiệm vụ đảm nhận chính trong bài lab: khung chính — `chat_rich.py` (Rich CLI), system prompt + tools v1–v3 (retrieval precision, write-action gate, external-data boundary), provider tương thích OpenAI/DeepSeek, bonus `software_catalog`. Commits `cb62d96`, `a5678e9`, `fc512f5`.
 - Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: extra-call H03 (hedge 2 category), sai `check` H13 (`all` thay vì `vpn`), cancel-flow M07, và sau merge là GRP02/GRP03/GRP09 + A07 — giải quyết bằng mapping 1-request→1-precise-call, latest-turn-wins, confirmation-gate, và phân biệt symptom/request + verbatim/instrumental ID demand.
 - Bài học rút ra về Prompt Engineering & Tool Calling: tool description cũng là prompt (model chỉ thấy declaration); rule càng trừu tượng càng dễ variance — phải neo bằng ví dụ trigger cụ thể (`"tôi là sếp"` → clarify, `"giữ nguyên chuỗi"` → clarify, `"kèm mã máy cho chính xác"` → clean-search).
 
-### B7.4 Reflection cá nhân — Khanh (KOT-NW — Họ tên/MSSV: điền)
+### B7.4 Reflection cá nhân — ĐỖ HOÀNG NAM KHÁNH (KOT-NW) — 2A202602423
 - Nhiệm vụ đảm nhận chính trong bài lab: fix provider DeepSeek, baseline v0, tools.yaml v1, prompt v2/v3, team eval 10 case (G01–G10), CLI Rich+Typer `app.py`, report kỹ thuật phần B. Commit `d24c842` (chi tiết xem `C2` bên dưới).
 - Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: `provider_error` 26/30 do deepseek-flash thinking mode từ chối `tool_choice required` (đổi sang `auto`), vỡ quote `deepseek-flash`, và whack-a-mole A05/A06 vs A11/A12 — giải quyết bằng rule phân biệt mixed-internal-only vs pure-external + response_type mapping.
 - Bài học rút ra về Prompt Engineering & Tool Calling: mỗi version cần đúng 1 hypothesis + metric + run file; khi cùng artifact cho kết quả khác nhau giữa các run thì ghi nhận variance thay vì overfit (xem B2/B7 technical).
@@ -185,7 +185,7 @@ Transcripts bản nộp (`v5-catalog`, nộp kèm trong `transcripts/`): `v5-cat
 
 ## C2. Self-reflection của từng thành viên
 
-### Khanh — MSSV (điền) — GitHub (điền, branch `khanh`)
+### ĐỖ HOÀNG NAM KHÁNH — 2A202602423 — GitHub KOT-NW (branch `khanh`)
 
 - **Vai trò/phần việc được nhận:** prompt/tool-calling lab: fix provider DeepSeek, baseline v0, tools.yaml v1, prompt v2/v3, team eval 10 case, CLI Rich+Typer, report kỹ thuật.
 - **Những gì tôi đã thay đổi trong repo chung:** `providers/openai_provider.py`, `run_eval.py` (tương thích thinking mode), `artifacts/system_prompt.md`, `artifacts/tools.yaml`, `artifacts/version_log.csv`, `data/eval_group.json`, `app.py`, `requirements.txt`, `artifacts/REPORT.md` (phần B).
