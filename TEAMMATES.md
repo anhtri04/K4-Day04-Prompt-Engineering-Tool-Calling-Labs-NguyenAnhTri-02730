@@ -41,7 +41,13 @@ Merge commits trên `main`: `382a62d` (anhtri) → `81a24cc` (Tri) → `e8f3017`
 
 ## Kiểm thử cuối trên `main` (2026-09-15, provider `openai` + model `deepseek-flash`)
 - `py_compile` toàn bộ `starter_v0/*.py`, `providers/*`, `tools/*`: OK
-- `tools.yaml` load 9 tools; cả 4 dataset (`eval_base` 30, `eval_group` 10, `eval_adversarial` 12, `eval_helpdesk_extension` 10) validate OK qua `validate_expected_tools`
-- Live eval base: **30/30 (accuracy 1.0, 0 provider_error)** — `runs/merged-main_B_base_openai_20260915T114851072065.json` (gitignored)
-- Live eval group (10 case của Phat): **7/10, 0 provider_error** — 3 case rớt thuộc diện judgment-call (GRP02 model chọn `inspect_device` thay vì `search_device_info`; GRP03 prompt từ chối no-tool thay vì clarify theo luật anti-role-spoof; GRP09 model clarify xin model công khai thay vì đoán) — `runs/merged-main_B_group_openai_20260915T114336192727.json` (gitignored)
+- `tools.yaml` load 10 tools (9 core + bonus `software_catalog`); cả 5 dataset (`eval_base` 30, `eval_group` 10, `eval_adversarial` 12, `eval_helpdesk_extension` 10, `eval_bonus` 4) validate OK qua `validate_expected_tools`
+- Live eval group sau fix GRP02/GRP03/GRP09 (prompt-only, không sửa test): **10/10, 0 provider_error** (`f913067`); kèm fix A07 never-clarify-as-refusal (`db7d764`)
+- Final artifacts `v4-grpfx2`: base **30/30**, group **10/10**, adversarial **12/12**, extension **10/10** (62/62, 0 provider_error)
+- Bonus `software_catalog`: smoke test offline **9/9** (`scripts/smoke_software_catalog.py`); live eval bonus **4/4**; sau khi thêm tool, re-run: group 10/10, extension 10/10, adversarial 12/12, base 30/30 sau 1 lần re-run (lần đầu 29/30 do H08 clarify-as-refusal variance của deepseek-flash — đã biết, xem REPORT Khanh B7)
 - `chat_rich.py --help` OK; `app.py --help` OK (cần `pip install typer` — đã khai báo trong `requirements.txt`)
+
+## Bonus tool (track bonus)
+- `software_catalog` — catalog phần mềm giả lập: bản đã cài / bản được duyệt / license / approval (`approved|restricted|banned`), status `current|outdated|restricted|unapproved`.
+- Files: `tools/software_catalog/{TOOL.md, tool.py, __init__.py}`, `helpdesk_data/software_catalog.json`, registry `tools/__init__.py`, khai báo `tools.yaml`, routing line trong `system_prompt.md`, `scripts/smoke_software_catalog.py`, `data/eval_bonus.json` (4 case riêng để giữ `eval_group` đúng 10 case), dòng `v5_catalog` trong `version_log.csv`.
+- Tool bonus thứ hai (`diagnose_network_path`): chưa làm — follow-up.
