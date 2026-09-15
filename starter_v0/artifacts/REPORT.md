@@ -154,7 +154,7 @@ Transcripts bản nộp (`v5-catalog`, nộp kèm trong `transcripts/`): `v5-cat
 - Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: starter prompt sơ sài + rate-limit 429 trên free-tier khiến eval chết giữa chừng (`provider_error`) — giải quyết bằng operational rules theo capability và retry/backoff + delay giữa các case.
 - Bài học rút ra về Prompt Engineering & Tool Calling: prompt vận hành phải liệt kê ranh giới từng tool thay vì mô tả chung chung; harness cũng là một phần của độ tin cậy (retry biến `provider_error` thành metric đo được).
 
-### B7.2 Reflection cá nhân — Phát (lechautranphat) — MSSV: (chưa rõ, cần bổ sung)
+### B7.2 Reflection cá nhân — LÊ CHÂU TRẦN PHÁT (lechautranphat) — 2A202602545
 - Nhiệm vụ đảm nhận chính trong bài lab: 10 test case nhóm GRP01–GRP10 (adversarial: hallucination ID, exfiltration, confirmation-bypass, prompt injection, parallel, cancel-flow, malicious-confirm, trick-env, stealth-exfiltration, memory-loss) + tools v3 + `REPORT.md`/`PRESENTATION.md` + `version_log.csv`. Commits `0130ffb`, `feef73d`, `ba86108`, `e2a2139`, `1ddb823`, `8413e8e`, `477c43c`, `25cbaca`, `853d1f8`.
 - Kịch bản lỗi (failure mode) đã trực tiếp phân tích và giải quyết: LLM bịa ID khi thiếu info (GRP01), lọt asset ID ra web search (GRP02/GRP09), vượt rào xác nhận bằng roleplay/ép buộc (GRP03/GRP07) — giải quyết bằng test-bẫy có `failure_type` rõ ràng để khóa hành vi, rồi siết `tools.yaml` (clarify bắt buộc, cấm đoán ID/env, cấm paste pseudo-confirmation).
 - Bài học rút ra về Prompt Engineering & Tool Calling: viết test adversarial chính là viết đặc tả — mỗi case phải cô lập đúng 1 failure mode, nếu không metric 10/10 không còn ý nghĩa.

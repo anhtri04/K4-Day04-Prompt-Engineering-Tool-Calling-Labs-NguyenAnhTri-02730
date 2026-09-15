@@ -7,7 +7,7 @@ Merge commits trên `main`: `382a62d` (anhtri) → `81a24cc` (Tri) → `e8f3017`
 | # | Họ tên | MSSV | Branch | Vai trò |
 |---|---|---|---|---|
 | 1 | Võ Đức Trí | (chưa rõ — cần bổ sung) | `Tri` | System prompt & eval harness |
-| 2 | Phát | (chưa rõ — cần bổ sung) | `phat` | 10 test case eval_group + tools v3 + docs |
+| 2 | LÊ CHÂU TRẦN PHÁT | 2A202602545 | `phat` | 10 test case eval_group + tools v3 + docs |
 | 3 | Nguyễn Anh Trí (lead) | 2A202602730 | `anhtri` | Khung chính (prompt/tools, CLI, provider, bonus tool) |
 | 4 | ĐỖ HOÀNG NAM KHÁNH | 2A202602423 | `khanh` | DeepSeek harness + CLI + REPORT |
 
